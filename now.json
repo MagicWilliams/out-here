@@ -1,0 +1,8 @@
+{
+  "build": {
+    "env": {
+      "OUT_HERE_CONTENTFUL_SPACE_ID": "@out_here_contentful_space_id",
+      "OUT_HERE_CONTENTFUL_ACCESS_TOKEN": "@out_here_contentful_access_token"
+    }
+  }
+}

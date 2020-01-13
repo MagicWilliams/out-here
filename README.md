@@ -1,2 +1,2 @@
-# out-here
-Website for Out Here, a project led by Kyana Gordon. 
+# web-starter
+My own base template for web projects
