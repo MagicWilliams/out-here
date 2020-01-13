@@ -63,8 +63,6 @@ export default class MyApp extends App {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: geometricPrecision;
-            // font-size: 1.1rem;
-            font-size: 16px;
             line-height: 1.45;
             -webkit-tap-highlight-color: rgba(0,0,0,0);
           }
