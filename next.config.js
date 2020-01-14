@@ -16,7 +16,7 @@ module.exports = withCSS(withSass({
     return config;
   },
   env: {
-    SPACE_ID: process.env.OUT_HERE_CONTENTFUL_SPACE_ID,
-    ACCESS_TOKEN: process.env.OUT_HERE_CONTENTFUL_ACCESS_TOKEN,
+    OUT_HERE_CONTENTFUL_SPACE_ID: process.env.OUT_HERE_CONTENTFUL_SPACE_ID,
+    OUT_HERE_CONTENTFUL_ACCESS_TOKEN: process.env.OUT_HERE_CONTENTFUL_ACCESS_TOKEN,
   },
 }));

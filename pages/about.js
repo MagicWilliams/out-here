@@ -2,7 +2,6 @@ import React from 'react';
 import Head from 'next/head';
 
 function Home(props) {
-  console.log(props.entries);
   return (
     <div className='About'>
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
