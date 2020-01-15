@@ -67,6 +67,24 @@ export default class MyApp extends App {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
           }
 
+          .links {
+            display: flex;
+            justify-content: center;
+          }
+
+          .links * {
+            margin: 0px 4px;
+            font-size: 20px;
+          }
+
+          .links .fin {
+            margin-right: 0px;
+          }
+
+          .links .period {
+            margin: 0;
+          }
+
         `}</style>
       </div>
     )

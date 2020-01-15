@@ -58,24 +58,6 @@ function MobileAbout() {
           margin: 50px 0px;
         }
 
-        .links {
-          display: flex;
-          justify-content: center;
-        }
-
-        .links * {
-          margin: 0px 4px;
-          font-size: 20px;
-        }
-
-        .links .fin {
-          margin-right: 0px;
-        }
-
-        .links .period {
-          margin: 0;
-        }
-
       `}</style>
     </div>
   );
@@ -135,23 +117,6 @@ function DesktopAbout() {
         .main-text {
           margin: 50px 0px;
           text-align: center;
-        }
-
-        .links {
-          display: flex;
-        }
-
-        .links * {
-          margin: 0px 4px;
-          font-size: 20px;
-        }
-
-        .links .fin {
-          margin-right: 0px;
-        }
-
-        .links .period {
-          margin: 0;
         }
 
       `}</style>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { withUserAgent } from 'next-useragent';
 
 Story.getInitialProps = async function(context) {
   const client = require('contentful').createClient({
@@ -25,12 +26,70 @@ Story.getInitialProps = async function(context) {
 }
 
 
-export default function Story(props) {
+function Story(props) {
   const { entry, state } = props;
-  return (
-      <DesktopStory entry={entry} state={state} />
-  );
+  const { isMobile } = props.ua;
+  console.log(isMobile);
+  return isMobile ? <MobileStory entry={entry} state={state} /> : <DesktopStory entry={entry} state={state} />;
 }
+
+class MobileStory extends React.PureComponent {
+  render () {
+    const { entry, state } = this.props;
+    const storyImage = entry[0].fields.image.fields.file.url;
+
+    return (
+      <div className='Story'>
+        <h1 className='story-state'> {state} </h1>
+        <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
+        <h1 className='state'></h1>
+        <img className='main-img' src={storyImage} alt='Story photo' />
+        <div className='audio'>
+        </div>
+        <p> Listen to the entire series on </p>
+        <div className='links'>
+          <a href='https://espn.com/nba'> Spotify, </a>
+          <a href='https://espn.com/nba'> iTunes, </a>
+          <p> or </p>
+          <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+          <p className='period'> . </p>
+        </div>
+
+        <style jsx> {`
+          .Story {
+            height: 100%;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 15px;
+          }
+
+          .Story .main-img {
+            width: 100%;
+            margin: 15px 0px;
+          }
+
+          .Story .x {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            height: 40px;
+            width: 40px;
+            z-index: 2;
+          }
+        `}</style>
+      </div>
+    );
+  }
+}
+
+
+
 
  class DesktopStory extends React.PureComponent {
    render () {
@@ -146,3 +205,5 @@ export default function Story(props) {
      );
    }
 }
+
+export default withUserAgent(Story);
