@@ -1,7 +1,14 @@
 import React from 'react';
 import Head from 'next/head';
+import { withUserAgent } from 'next-useragent';
 
-function Home(props) {
+function About(props) {
+  const { isMobile } = props.ua;
+  return isMobile ? <DesktopAbout /> : <MobileAbout />;
+}
+
+
+function DesktopAbout() {
   return (
     <div className='About'>
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
@@ -79,19 +86,4 @@ function Home(props) {
   );
 };
 
-Home.getInitialProps = async function() {
-  const client = require('contentful').createClient({
-    space: process.env.OUT_HERE_CONTENTFUL_SPACE_ID,
-    accessToken: process.env.OUT_HERE_CONTENTFUL_ACCESS_TOKEN
-  });
-
-  const entries = await client.getEntries({
-    content_type: 'entry',
-  });
-
-  return {
-    entries: entries.items,
-  }
-}
-
-export default Home
+export default withUserAgent(About);

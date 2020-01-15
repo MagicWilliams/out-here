@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
+import { withUserAgent } from 'next-useragent';
 
-export default function Home(props) {
-  return (
+function Home(props) {
+  const { isMobile } = props.ua;
+
+  return !isMobile ? (
     <DesktopHome entries={props.entries} />
+  ) : (
+    <MobileHome entries={props.entries} />
   );
 }
 
 class DesktopHome extends React.PureComponent {
-
   render() {
     const { entries } = this.props;
     return (
@@ -136,6 +140,92 @@ class DesktopHome extends React.PureComponent {
   }
 };
 
+function MobileHome(props) {
+  const { entries } = props;
+  return (
+    <div className='MobileHome'>
+      <img className='logo' src='/img/outhere-logo.png' alt='out-here' />
+      <img className='map' src='/img/map.png' alt='out-here' />
+      <img className='home-text' src='/img/home-text.png' alt='out-here' />
+      <div className='navigation'>
+        { entries.map((entry, i) => {
+          const { state } = entry.fields;
+          return (
+            <div onClick={() => window.location.href = '/story/' + state.toLowerCase()} className='dot-container'>
+              <div className='dot' key={i}></div>
+              <p> {state} </p>
+            </div>
+          )
+        })}
+      </div>
+      <a href='/about'> About </a>
+      <Head>
+        <title>Out Here - Kyana Gordon</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <style jsx>{`
+        .MobileHome {
+          height: 100%;
+          min-height: 100vh;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          overflow: hidden;
+          padding: 15px;
+          padding-top: 45px;
+        }
+
+        .logo, .map, .home-text, .navigation {
+          width: 95%;
+        }
+
+        .logo {
+          z-index: 2;
+        }
+
+        .map {
+          position: relative;
+          top: -35px;
+        }
+
+        .navigation {
+          flex: 1;
+          position: relative;
+        }
+
+        .dot-container {
+          display: flex;
+          flex-direction: column;
+          position: absolute;
+          left: 50px;
+          top: 75px;
+          color: black;
+          flex: none;
+          align-items: center;
+        }
+
+        .dot-container .dot {
+          border-radius: 100%;
+          background: #ffb9a3;
+          height: 40px;
+          width: 40px;
+          flex: none;
+        }
+
+        a {
+          align-self: flex-end;
+          margin: 15px 25px;
+        }
+
+      `}</style>
+
+    </div>
+  );
+}
+
 Home.getInitialProps = async function() {
   const client = require('contentful').createClient({
     space: process.env.OUT_HERE_CONTENTFUL_SPACE_ID,
@@ -150,3 +240,5 @@ Home.getInitialProps = async function() {
     entries: entries.items,
   }
 }
+
+export default withUserAgent(Home);
