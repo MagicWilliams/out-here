@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
 import ReactPlayer from 'react-player';
@@ -34,188 +34,251 @@ function Story(props) {
   return isMobile ? <MobileStory entry={entry} state={state} /> : <DesktopStory entry={entry} state={state} />;
 }
 
-class MobileStory extends React.PureComponent {
-  render () {
-    const { entry, state } = this.props;
-    const { audio, subtitles } = this.props.entry[0].fields;
-    const storyImage = entry[0].fields.image.fields.file.url;
-    new audioSync({
-      audioPlayer: 'audiofile', // the id of the audio tag
-      subtitlesContainer: 'subtitles', // the id where subtitles should show
-      subtitlesFile: subtitles.fields.file.url // the path to the vtt file
-    });
+function MobileStory(props) {
+  const { entry, state } = props;
+  const { audio, subtitles } = props.entry[0].fields;
+  const storyImage = entry[0].fields.image.fields.file.url;
+  const [playing, setPlaying] = useState(true);
+  const currState = playing ? '/img/play.svg' : '/img/pause.svg';
 
-    return (
-      <div className='Story'>
-        <h1 className='story-state'> {state} </h1>
-        <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
-        <h1 className='state'></h1>
+  return (
+    <div className='MobileStory'>
+      <img className='state' src='/img/state.png' />
+      <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
+      <h1 className='state'></h1>
+      <div className='img-container' onClick={() => setPlaying(!playing)}>
         <img className='main-img' src={storyImage} alt='Story photo' />
-        <div className='audio'>
-          <audio id='audiofile' src={audio.fields.file.url} />
-          <div id='subtitles'></div>
-
-        </div>
-        <p> Listen to the entire series on </p>
-        <div className='links'>
-          <a href='https://espn.com/nba'> Spotify, </a>
-          <a href='https://espn.com/nba'> iTunes, </a>
-          <p> or </p>
-          <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
-          <p className='period'> . </p>
-        </div>
-
-        <style jsx> {`
-          .Story {
-            height: 100%;
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            padding: 15px;
-          }
-
-          .Story .main-img {
-            width: 100%;
-            margin: 15px 0px;
-          }
-
-          .Story .x {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            height: 40px;
-            width: 40px;
-            z-index: 2;
-          }
-        `}</style>
+        <h3 className='title'> Kim Gordon of West Virginia </h3>
       </div>
-    );
-  }
+      <div className='audio'>
+        <audio id='audiofile' src={audio.fields.file.url} />
+        <div id='subtitles'></div>
+      </div>
+      <p className='pre-links'> Listen to the entire series on </p>
+      <div className='links'>
+        <a href='https://espn.com/nba'> Spotify, </a>
+        <a href='https://espn.com/nba'> iTunes, </a>
+        <p> or </p>
+        <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+        <p className='period'> . </p>
+      </div>
+
+      <style jsx> {`
+        .MobileStory {
+          height: 100%;
+          min-height: 100vh;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          position: relative;
+          padding: 15px;
+          padding-top: 50px;
+        }
+
+        .MobileStory .main-img {
+          width: 100%;
+          margin-top: 10px
+        }
+
+        .MobileStory .x {
+          position: absolute;
+          top: 25px;
+          right: 25px;
+          height: 40px;
+          width: 40px;
+          z-index: 2;
+        }
+
+        .MobileStory .state {
+          width: 100%;
+        }
+
+        .img-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .title {
+          text-align: center;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 100%;
+          color: white;
+          transform: translate(-50%, -50%);
+        }
+
+        .pre-links {
+          margin-top: 15px;
+        }
+
+        .links {
+          display: flex;
+          justify-content: center;
+          width: 70%;
+        }
+
+        .links * {
+          margin: 0px 2px;
+          font-size: 14px;
+          white-space: nowrap;
+        }
+
+        .links .fin {
+          margin-right: 0px;
+        }
+
+        .links .period {
+          margin: 0;
+        }
+      `}</style>
+    </div>
+  );
 }
 
+function DesktopStory(props) {
+  const [playing, setPlaying] = useState(true);
+  const { entry, state } = props;
+  const trueEntry = entry[0];
+  const { audio, subtitles, image } = trueEntry.fields;
+  const storyImage = image.fields.file.url;
+  const currState = playing ? '/img/play.svg' : '/img/pause.svg';
 
-
-
- class DesktopStory extends React.PureComponent {
-   render () {
-     const { entry, state } = this.props;
-     const trueEntry = entry[0];
-     const { audio, subtitles, image } = trueEntry.fields;
-     const storyImage = image.fields.file.url;
-
-     return (
-       <div className='Story'>
-         <h1 className='story-state'> {state} </h1>
-         <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
-         <h1 className='state'></h1>
-          <div className='left'> </div>
-          <div className='middle'>
-            <img src={trueEntry.fields.image.fields.file.url} alt='Story photo' />
-          </div>
-          <div className='right'>
-            <div className='audio'>
-              <ReactPlayer playing controls url={audio.fields.file.url}
-                config={{ file: {
-                  tracks: [{kind: 'subtitles', src: subtitles.fields.file.url, srcLang: 'en', default: true}]
-                }}}
-              />
-            </div>
-            <div className='links'>
-              <p> Listen to the entire series on </p>
-              <a href='https://espn.com/nba'> Spotify, </a>
-              <a href='https://espn.com/nba'> iTunes, </a>
-              <p> or </p>
-              <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
-              <p className='period'> . </p>
-            </div>
-          </div>
-
-         <style jsx> {`
-           .Story {
-             height: 100%;
-             min-height: 100vh;
-             width: 100%;
-             display: flex;
-             justify-content: center;
-             align-items: center;
-             overflow: hidden;
-             position: relative;
-           }
-
-           .Story .x {
-             position: absolute;
-             top: 25px;
-             right: 25px;
-             height: 40px;
-             width: 40px;
-             z-index: 2;
-           }
-
-           .story-state {
-             position: absolute;
-             top: 25px;
-             left: 40px;
-           }
-
-           .state {
-             position: absolute;
-             top: 25px;
-             left: 25px;
-           }
-
-           .left {
-             width: 20%;
-             height: 100vh;
-           }
-
-           .middle {
-             width: 35%;
-             height: 100vh;
-           }
-
-           .middle img {
-             margin-top: 100px;
-             width: 100%;
-           }
-
-           .links {
-             display: flex;
-             justify-content: center;
-             position: absolute;
-             bottom: 25px;
-             width: 100%;
-           }
-
-           .links * {
-             margin: 0px 4px;
-             font-size: 20px;
-           }
-
-           .links .fin {
-             margin-right: 0px;
-           }
-
-           .links .period {
-             margin: 0;
-           }
-
-           .right {
-             width: 45%;
-             height: 100vh;
-             position: relative;
-             display: flex;
-             justify-content: center;
-             align-items: center;
-           }
-         `}</style>
+  return (
+    <div className='Story'>
+    <img className='state' src='/img/state.png' />
+      <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
+       <div className='left'> </div>
+       <div className='middle'>
+         <img src={trueEntry.fields.image.fields.file.url} alt='Story photo' />
        </div>
-     );
-   }
+       <div className='right'>
+         <div className='audio' onClick={() => setPlaying(!playing)}>
+           <h3> Subtitles for the audio clip </h3>
+           <img src={currState} className='playPause'/>
+           <audio autoplay controls src={audio.fields.file.url} />
+         </div>
+         <div className='links'>
+           <p> Listen to the entire series on </p>
+           <a href='https://espn.com/nba'> Spotify, </a>
+           <a href='https://espn.com/nba'> iTunes, </a>
+           <p> or </p>
+           <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+           <p className='period'> . </p>
+         </div>
+       </div>
+
+      <style jsx> {`
+        .Story {
+          height: 100%;
+          min-height: 100vh;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .Story .x {
+          position: absolute;
+          top: 25px;
+          right: 25px;
+          height: 40px;
+          width: 40px;
+          z-index: 2;
+        }
+
+        .Story .state {
+          position: absolute;
+        }
+
+        .state {
+          position: absolute;
+          top: 5px;
+          left: -25px;
+          z-index: -1;
+        }
+
+        .left {
+          width: 20%;
+          height: 100vh;
+        }
+
+        .middle {
+          width: 35%;
+          height: 100vh;
+        }
+
+        .middle img {
+          margin-top: 100px;
+          width: 100%;
+        }
+
+        .links {
+          display: flex;
+          justify-content: center;
+          position: absolute;
+          bottom: 75px;
+          width: 70%;
+        }
+
+        .links * {
+          margin: 0px 2px;
+          font-size: 14px;
+          white-space: nowrap;
+        }
+
+        .links .fin {
+          margin-right: 0px;
+        }
+
+        .links .period {
+          margin: 0;
+        }
+
+        .audio {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          flex-direction: column;
+          align-items: center;
+          padding: 25px;
+          height: 400px;
+        }
+
+        .audio h3 {
+          margin-bottom: 40px;
+          font-weight: bold;
+        }
+
+        .audio audio {
+          width: 75%;
+          visibility: hidden;
+        }
+
+        .right {
+          width: 45%;
+          height: 100vh;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .right .playPause {
+          height: 25px;
+          width: 25px;
+        }
+      `}</style>
+    </div>
+  )
 }
+
 
 export default withUserAgent(Story);
