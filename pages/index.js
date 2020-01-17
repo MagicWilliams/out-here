@@ -24,7 +24,7 @@ class DesktopHome extends React.PureComponent {
         <div className='body'>
           <div className='left'>
             <div className='map'>
-              <img src='/img/new-map.png' alt='map'/>
+              <img src='/img/new-bkg.png' alt='map'/>
               { entries.map((entry, i) => {
                 const { state } = entry.fields;
                 return (
@@ -120,8 +120,9 @@ class DesktopHome extends React.PureComponent {
           }
 
           .details img {
-            width: 100%;
-            object-fit: contain;
+            width: 50%;
+            margin-top: 2.5%;
+            max-width: 500px;
           }
 
           .logo-container {
