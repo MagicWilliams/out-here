@@ -24,7 +24,7 @@ class DesktopHome extends React.PureComponent {
         <div className='body'>
           <div className='left'>
             <div className='map'>
-              <img src='/img/map.png' alt='map'/>
+              <img src='/img/new-map.png' alt='map'/>
               { entries.map((entry, i) => {
                 const { state } = entry.fields;
                 return (
@@ -36,10 +36,7 @@ class DesktopHome extends React.PureComponent {
               })}
             </div>
             <div className='details'>
-              <p> Long text about the project and or Kyana </p>
-              <div className='logo-container'>
-                <img src='/img/outhere-logo.png' />
-              </div>
+              <img className='home-text' src='/img/home-text.png' />
             </div>
           </div>
           <div className='right'>
@@ -97,6 +94,7 @@ class DesktopHome extends React.PureComponent {
             width: 90%;
             display: flex;
             flex-direction: column;
+            min-width: 600px;
           }
 
           .left * {
@@ -114,24 +112,27 @@ class DesktopHome extends React.PureComponent {
           }
 
           .details {
-            width: 100%;
+            width: 50%;
             display: flex;
+            align-items: flex-start;
+            position: relative;
+            top: -90px;
           }
 
-          .details p {
-            text-align: center;
-            margin-top: 15px;
+          .details img {
+            width: 100%;
+            object-fit: contain;
           }
 
           .logo-container {
-            position: relative;
+            width: 70%;
+            position: absolute;
+            bottom: -25px;
+            right: -50px;
           }
 
           .logo-container img {
-            width: 600px;
-            position: absolute;
-            top: -50px;
-            right: -100px;
+            width: 100%;
           }
 
         `}</style>

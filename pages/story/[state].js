@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
+import ReactPlayer from 'react-player';
 
 Story.getInitialProps = async function(context) {
   const client = require('contentful').createClient({
@@ -36,7 +37,13 @@ function Story(props) {
 class MobileStory extends React.PureComponent {
   render () {
     const { entry, state } = this.props;
+    const { audio, subtitles } = this.props.entry[0].fields;
     const storyImage = entry[0].fields.image.fields.file.url;
+    new audioSync({
+      audioPlayer: 'audiofile', // the id of the audio tag
+      subtitlesContainer: 'subtitles', // the id where subtitles should show
+      subtitlesFile: subtitles.fields.file.url // the path to the vtt file
+    });
 
     return (
       <div className='Story'>
@@ -45,6 +52,9 @@ class MobileStory extends React.PureComponent {
         <h1 className='state'></h1>
         <img className='main-img' src={storyImage} alt='Story photo' />
         <div className='audio'>
+          <audio id='audiofile' src={audio.fields.file.url} />
+          <div id='subtitles'></div>
+
         </div>
         <p> Listen to the entire series on </p>
         <div className='links'>
@@ -95,6 +105,9 @@ class MobileStory extends React.PureComponent {
    render () {
      const { entry, state } = this.props;
      const trueEntry = entry[0];
+     const { audio, subtitles, image } = trueEntry.fields;
+     const storyImage = image.fields.file.url;
+
      return (
        <div className='Story'>
          <h1 className='story-state'> {state} </h1>
@@ -106,6 +119,11 @@ class MobileStory extends React.PureComponent {
           </div>
           <div className='right'>
             <div className='audio'>
+              <ReactPlayer playing controls url={audio.fields.file.url}
+                config={{ file: {
+                  tracks: [{kind: 'subtitles', src: subtitles.fields.file.url, srcLang: 'en', default: true}]
+                }}}
+              />
             </div>
             <div className='links'>
               <p> Listen to the entire series on </p>
@@ -163,12 +181,6 @@ class MobileStory extends React.PureComponent {
            .middle img {
              margin-top: 100px;
              width: 100%;
-           }
-
-           .audio {
-             width: 80%;
-             background: gray;
-             height: 500px;
            }
 
            .links {
