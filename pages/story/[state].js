@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
 import ReactPlayer from 'react-player';
@@ -143,11 +143,37 @@ function MobileStory(props) {
 
 function DesktopStory(props) {
   const [playing, setPlaying] = useState(true);
+  const [currTime, setCurrTime] = useState(null);
+  const audioEl = useRef(null);
+
+  const updatePlayStatus = () => {
+    console.log(playing);
+    if (playing) {
+      audioEl.current.pause();
+    } else {
+      audioEl.current.play();
+    }
+    setPlaying(!playing);
+  }
+
+  const onPlay = () => {
+
+  }
+
+  const onPause = () => {
+    clearInterval(currentTimeInterval);
+  }
+
+  const updateTime = () => {
+    const currentAudioTime = Math.floor(audioEl.current.currentTime);
+    setCurrTime(currentAudioTime);
+  }
+
   const { entry, state } = props;
   const trueEntry = entry[0];
   const { audio, subtitles, image } = trueEntry.fields;
   const storyImage = image.fields.file.url;
-  const currState = playing ? '/img/play.svg' : '/img/pause.svg';
+  const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
 
   return (
     <div className='Story'>
@@ -158,10 +184,10 @@ function DesktopStory(props) {
          <img src={trueEntry.fields.image.fields.file.url} alt='Story photo' />
        </div>
        <div className='right'>
-         <div className='audio' onClick={() => setPlaying(!playing)}>
+         <div className='audio' onClick={updatePlayStatus}>
            <h3> Subtitles for the audio clip </h3>
            <img src={currState} className='playPause'/>
-           <audio autoplay controls src={audio.fields.file.url} />
+           <audio onPlay={onPlay} ref={audioEl} onTimeUpdate={updateTime} autoPlay controls src={audio.fields.file.url} />
          </div>
          <div className='links'>
            <p> Listen to the entire series on </p>
@@ -212,6 +238,7 @@ function DesktopStory(props) {
 
         .middle {
           width: 35%;
+          min-width: 350px;
           height: 100vh;
         }
 

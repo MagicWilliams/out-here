@@ -4,7 +4,6 @@ import { withUserAgent } from 'next-useragent';
 
 function About(props) {
   const { isMobile } = props.ua;
-  console.log(isMobile);
   return isMobile ? <MobileAbout /> : <DesktopAbout />;
 }
 
