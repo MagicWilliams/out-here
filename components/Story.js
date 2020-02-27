@@ -2,42 +2,26 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
 import ReactPlayer from 'react-player';
-
-Story.getInitialProps = async function(context) {
-  const client = require('contentful').createClient({
-    space: process.env.OUT_HERE_CONTENTFUL_SPACE_ID,
-    accessToken: process.env.OUT_HERE_CONTENTFUL_ACCESS_TOKEN
-  });
-
-  let matchingStories;
-
-  await client.getEntries({
-    content_type: 'entry',
-  }).then((res) => {
-    const state = context.query.state.replace(/\s/g, '').toLowerCase();
-    matchingStories = [...res.items].filter((event) => {
-      return event.fields.state.toLowerCase() === state;
-    });
-  });
-
-  return {
-    entry: matchingStories,
-    state: context.query.state,
-  }
-}
-
+import { stories } from '../utils';
 
 function Story(props) {
-  const { entry, state } = props;
+  const { entries, state } = props;
   const { isMobile } = props.ua;
-  console.log(isMobile);
-  return isMobile ? <MobileStory entry={entry} state={state} /> : <DesktopStory entry={entry} state={state} />;
+  const entry = props.entries.filter((event) => {
+    return event.fields.state === props.state;
+  })
+
+  if (!entry[0]) {
+    console.log('fuclk');
+    return null;
+  }
+  return isMobile ? <MobileStory entry={entry[0]} state={state} /> : <DesktopStory entry={entry[0]} state={state} />;
 }
 
 function MobileStory(props) {
   const { entry, state } = props;
-  const { audio, subtitles } = props.entry[0].fields;
-  const storyImage = entry[0].fields.image.fields.file.url;
+  const { audio, subtitles } = entry.fields;
+  const storyImage = entry.fields.image.fields.file.url;
   const [playing, setPlaying] = useState(true);
   const currState = playing ? '/img/play.svg' : '/img/pause.svg';
 
@@ -79,7 +63,7 @@ function MobileStory(props) {
         }
 
         .MobileStory .main-img {
-          width: 100%;
+          width: 95%;
           margin-top: 10px
         }
 
@@ -142,8 +126,16 @@ function MobileStory(props) {
 }
 
 function DesktopStory(props) {
+  console.log(props);
+
+  const { entry, state } = props;
+  const { audio, subtitles, image, name } = entry.fields;
+
   const [playing, setPlaying] = useState(true);
+  const [donePlaying, setDonePlaying] = useState(false);
   const [currTime, setCurrTime] = useState(null);
+  const [captionIndex, setCaptionIndex] = useState(0);
+  const [currSubtitle, setCurrSubtitle] = useState(stories[name][captionIndex].text);
   const audioEl = useRef(null);
 
   const updatePlayStatus = () => {
@@ -156,24 +148,34 @@ function DesktopStory(props) {
     setPlaying(!playing);
   }
 
-  const onPlay = () => {
-
-  }
-
   const onPause = () => {
     clearInterval(currentTimeInterval);
   }
 
   const updateTime = () => {
-    const currentAudioTime = Math.floor(audioEl.current.currentTime);
+    const { currentTime, duration } = audioEl.current;
+    const timeToChange = stories[name][captionIndex].time;
+
+    if (currentTime === duration) {
+      setDonePlaying(true);
+    }
+
+    if (currentTime > timeToChange) {
+      if (stories[name][captionIndex + 1]) {
+        setCurrSubtitle(stories[name][captionIndex + 1].text);
+        setCaptionIndex(captionIndex + 1);
+      }
+    }
+
+    const currentAudioTime = Math.floor(currentTime);
     setCurrTime(currentAudioTime);
+
   }
 
-  const { entry, state } = props;
-  const trueEntry = entry[0];
-  const { audio, subtitles, image } = trueEntry.fields;
   const storyImage = image.fields.file.url;
   const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
+  const transcript = stories[name];
+
 
   return (
     <div className='Story'>
@@ -181,13 +183,18 @@ function DesktopStory(props) {
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
        <div className='left'> </div>
        <div className='middle'>
-         <img src={trueEntry.fields.image.fields.file.url} alt='Story photo' />
+         <img src={entry.fields.image.fields.file.url} alt='Story photo' />
        </div>
        <div className='right'>
          <div className='audio' onClick={updatePlayStatus}>
-           <h3> Subtitles for the audio clip </h3>
+           { donePlaying && (
+             <h2 className='caption'> Listen to the entire series on Spotify, iTunes, or Soundcloud </h2>
+           )}
+           { !donePlaying && (
+             <h2 className='caption'> {playing ? currSubtitle : name + ' of ' + state} </h2>
+           )}
            <img src={currState} className='playPause'/>
-           <audio onPlay={onPlay} ref={audioEl} onTimeUpdate={updateTime} autoPlay controls src={audio.fields.file.url} />
+           <audio ref={audioEl} onTimeUpdate={updateTime} autoPlay controls src={audio.fields.file.url} />
          </div>
          <div className='links'>
            <p> Listen to the entire series on </p>
@@ -236,6 +243,11 @@ function DesktopStory(props) {
           height: 100vh;
         }
 
+        .caption {
+          text-align: center;
+          width: 75%;
+        }
+
         .middle {
           width: 35%;
           min-width: 350px;
@@ -279,9 +291,9 @@ function DesktopStory(props) {
           height: 400px;
         }
 
-        .audio h3 {
+        .audio h2 {
           margin-bottom: 40px;
-          font-weight: bold;
+          font-weight: ${ playing ? 'normal' : 'bold'} ;
         }
 
         .audio audio {
