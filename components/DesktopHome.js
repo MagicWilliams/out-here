@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Story from './story';
+import Story from './Story';
 import About from './About';
 import Layer from './Layer';
 import { getDotAssets } from '../utils';

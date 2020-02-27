@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getDotAssets } from '../utils';
-import Story from './story';
+import Story from './Story';
 import About from './About';
 import Layer from './Layer';
 function MobileHome(props) {
