@@ -3,41 +3,80 @@ import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
 import ReactPlayer from 'react-player';
 import { stories } from '../utils';
+import Layer from './Layer';
 
 function Story(props) {
   const { entries, state } = props;
+  const [fadeIn, setFadeIn] = useState(false);
   const { isMobile } = props.ua;
   const entry = props.entries.filter((event) => {
     return event.fields.state === props.state;
   })
+  const layerRef = useRef(null);
 
   if (!entry[0]) {
-    console.log('fuclk');
     return null;
   }
-  return isMobile ? <MobileStory entry={entry[0]} state={state} /> : <DesktopStory entry={entry[0]} state={state} />;
+
+  return isMobile ? (
+    <div className='Story'>
+      <Layer>
+        <MobileStory entry={entry[0]} state={state} />
+      </Layer>
+      <style jsx> {`
+        .Story {
+          min-width: 100vw;
+        }
+      `}</style>
+    </div>
+  ) : (
+    <div className='Story'>
+      <Layer>
+        <DesktopStory entry={entry[0]} state={state} />
+      </Layer>
+      <style jsx> {`
+        .Story {
+          min-width: 100vw;
+        }
+      `}</style>
+    </div>
+  )
 }
 
 function MobileStory(props) {
   const { entry, state } = props;
   const { audio, subtitles } = entry.fields;
   const storyImage = entry.fields.image.fields.file.url;
-  const [playing, setPlaying] = useState(true);
-  const currState = playing ? '/img/play.svg' : '/img/pause.svg';
+  const [playing, setPlaying] = useState(false);
+  const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
+  const audioEl = useRef(null);
+
+
+  const updatePlayStatus = () => {
+    if (playing) {
+      audioEl.current.pause();
+    } else {
+      audioEl.current.play();
+    }
+    setPlaying(!playing);
+  }
 
   return (
     <div className='MobileStory'>
       <img className='state' src='/img/state.png' />
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
       <h1 className='state'></h1>
-      <div className='img-container' onClick={() => setPlaying(!playing)}>
+      <div className='img-container' onClick={updatePlayStatus}>
         <img className='main-img' src={storyImage} alt='Story photo' />
         <h3 className='title'> Kim Gordon of West Virginia </h3>
       </div>
+
       <div className='audio'>
-        <audio id='audiofile' src={audio.fields.file.url} />
-        <div id='subtitles'></div>
+        <audio id='audiofile' ref={audioEl} src={audio.fields.file.url} />
       </div>
+
+      <img src={currState} className='playPause' onClick={updatePlayStatus} />
+
       <p className='pre-links'> Listen to the entire series on </p>
       <div className='links'>
         <a href='https://espn.com/nba'> Spotify, </a>
@@ -120,18 +159,21 @@ function MobileStory(props) {
         .links .period {
           margin: 0;
         }
+
+        .playPause {
+          margin-top: 20px;
+          height: 40px;
+          width: 40px;
+        }
       `}</style>
     </div>
   );
 }
 
 function DesktopStory(props) {
-  console.log(props);
-
   const { entry, state } = props;
   const { audio, subtitles, image, name } = entry.fields;
-
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [donePlaying, setDonePlaying] = useState(false);
   const [currTime, setCurrTime] = useState(null);
   const [captionIndex, setCaptionIndex] = useState(0);
@@ -139,7 +181,6 @@ function DesktopStory(props) {
   const audioEl = useRef(null);
 
   const updatePlayStatus = () => {
-    console.log(playing);
     if (playing) {
       audioEl.current.pause();
     } else {
@@ -175,7 +216,6 @@ function DesktopStory(props) {
   const storyImage = image.fields.file.url;
   const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
   const transcript = stories[name];
-
 
   return (
     <div className='Story'>
@@ -246,6 +286,7 @@ function DesktopStory(props) {
         .caption {
           text-align: center;
           width: 75%;
+          padding: 25px;
         }
 
         .middle {

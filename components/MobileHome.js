@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { getDotAssets } from '../utils';
 import Story from './story';
-
+import About from './About';
+import Layer from './Layer';
 function MobileHome(props) {
   const [story, setStory] = useState(null);
   const { entries } = props;
   return (
-    <div>
-      { story !== null && (
-        <Story entries={entries} state={story} />
-      )}
-
+    <Layer>
       { story === null && (
         <div className='MobileHome'>
-
           <img className='main' src='/img/main-img.png' alt='out-here' />
           { entries.map((entry, i) => {
             const { state } = entry.fields;
@@ -26,13 +22,13 @@ function MobileHome(props) {
               left: mobileLeft +'%',
             }
             return (
-              <div style={positionStyles} onClick={() => setStory(state)} className='dot-container'>
+              <div style={positionStyles} onClick={() => setStory(state)} className='dot-container' key={i}>
                 <div style={colorStyles} className='dot' key={i}></div>
                 <img src={stateImg} className='state-img' alt={state} />
               </div>
             )
           })}
-          <h3> About </h3>
+          <h3 className='about' onClick={() => setStory('About')}> About </h3>
 
           <style jsx>{`
             .MobileHome {
@@ -103,7 +99,13 @@ function MobileHome(props) {
           `}</style>
         </div>
       )}
-    </div>
+      { story === 'About' && (
+        <About />
+      )}
+      { story !== null && story !== 'About' && (
+        <Story entries={entries} state={story} />
+      )}
+    </Layer>
   );
 }
 
