@@ -1,3 +1,5 @@
+import React, { useEffect } from 'react';
+
 // place for commonly used functions and such
 export const stories = {
   "hhh" : [

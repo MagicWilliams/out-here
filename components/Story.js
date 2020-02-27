@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { withUserAgent } from 'next-useragent';
 import ReactPlayer from 'react-player';
-import { stories } from '../utils';
+import { stories, getDotAssets } from '../utils';
 import Layer from './Layer';
 
 function Story(props) {
@@ -50,7 +50,9 @@ function MobileStory(props) {
   const [playing, setPlaying] = useState(false);
   const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
   const audioEl = useRef(null);
-
+  const randomDotStyles = {
+    background: getDotAssets(state).color,
+  }
 
   const updatePlayStatus = () => {
     if (playing) {
@@ -67,6 +69,7 @@ function MobileStory(props) {
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
       <h1 className='state'></h1>
       <div className='img-container' onClick={updatePlayStatus}>
+        <div style={randomDotStyles} className='randomDot'> </div>
         <img className='main-img' src={storyImage} alt='Story photo' />
         <h3 className='title'> Kim Gordon of West Virginia </h3>
       </div>
@@ -89,7 +92,7 @@ function MobileStory(props) {
       <style jsx> {`
         .MobileStory {
           height: 100%;
-          min-height: 100vh;
+          min-height: 90vh;
           width: 100%;
           display: flex;
           flex-direction: column;
@@ -104,6 +107,15 @@ function MobileStory(props) {
         .MobileStory .main-img {
           width: 95%;
           margin-top: 10px
+        }
+
+        .MobileStory .randomDot {
+          border-radius: 100%;
+          height: 50px;
+          width: 50px;
+          position: absolute;
+          top: -13px;
+          left: 275px;
         }
 
         .MobileStory .x {

@@ -32,16 +32,14 @@ function MobileHome(props) {
 
           <style jsx>{`
             .MobileHome {
-              height: 100%;
-              min-height: 100vh;
               width: 100%;
+              min-height: 90vh;
               display: flex;
               flex-direction: column;
               justify-content: center;
               align-items: center;
               overflow: hidden;
               padding: 15px;
-              padding-top: 45px;
               position: relative;
             }
 
@@ -86,8 +84,8 @@ function MobileHome(props) {
 
             h3 {
               position: absolute;
-              bottom: 10px;
-              right: 50px;
+              bottom: 30px;
+              right: 40px;
               align-self: flex-end;
               margin: 15px 25px;
             }

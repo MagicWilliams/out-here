@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState} from 'react';
 import Head from 'next/head';
 import { withUserAgent } from 'next-useragent';
 import DesktopHome from '../components/DesktopHome';
 import MobileHome from '../components/MobileHome';
+import { useCurrentWidth } from '../utils';
+
 function Home(props) {
   const { isMobile } = props.ua;
 
