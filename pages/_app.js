@@ -67,12 +67,12 @@ export default class MyApp extends App {
             -webkit-tap-highlight-color: rgba(0,0,0,0);
           }
 
-          .links {
+          .links, .replay-links {
             display: flex;
             justify-content: center;
           }
 
-          .links * {
+          .replay-links *, .links * {
             margin: 0px 4px;
             font-size: 20px;
           }

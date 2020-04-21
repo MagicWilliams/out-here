@@ -187,7 +187,7 @@ function MobileStory(props) {
           white-space: nowrap;
         }
 
-        .links .fin {
+        .replay-links .fin, links .fin {
           margin-right: 0px;
         }
 
@@ -209,52 +209,40 @@ function DesktopStory(props) {
   const [playing, setPlaying] = useState(null);
   const { entries } = props;
   const [currAudio, setCurrAudio] = useState(null);
-
+  const firstRow = ['Lorene', 'Baba', 'Shannon'];
   const initName = playing ? playing : entries[0].fields.name;
   const [name, setName] = useState(initName);
-  const [donePlaying, setDonePlaying] = useState(false);
-  const [currTime, setCurrTime] = useState(null);
+  const [donePlaying, setDonePlaying] = useState(null);
   const [captionIndex, setCaptionIndex] = useState(0);
   const [currSubtitle, setCurrSubtitle] = useState(stories[name][captionIndex].text);
   const audioEl1 = useRef(null);
   const audioEl2 = useRef(null);
 
-  const updatePlayStatus = (name, currRef) => {
-    const firstRowNames = ['Lorene', 'Baba', 'Shannon'];
-    if (firstRowNames.includes(name)) {
-      if (playing === name) {
-        currRef.current.pause();
-        setPlaying(null);
-      } else if (playing !== name && playing !== null) {
-        audioEl2.current.pause();
-        audioEl2.current.currentTime = 0;
-        currRef.current.play();
-        setPlaying(name);
-        setName(name);
-        setCurrSubtitle(stories[name][captionIndex].text);
-      } else {
-        currRef.current.play();
-        setName(name);
-        setPlaying(name);
-        setCurrSubtitle(stories[name][captionIndex].text);
-      }
+  const updatePlayStatus = (name) => {
+    const audioEl = firstRow.includes(name) ? audioEl1 : audioEl2;
+    const otherAudioEl = firstRow.includes(name) ? audioEl2 : audioEl1;
+
+    if (donePlaying === name) {
+      setDonePlaying(null);
+    }
+
+    if (playing === name) {
+      audioEl.current.pause();
+      setPlaying(null);
+    } else if (playing !== null && playing !== null) {
+      otherAudioEl.current.pause();
+      setCaptionIndex(0);
+      audioEl.current.currentTime = 0;
+      otherAudioEl.current.currentTime = 0;
+      audioEl.current.play();
+      setName(name);
+      setCurrSubtitle(stories[name][0].text);
+      setPlaying(name);
     } else {
-      if (playing === name) {
-        currRef.current.pause();
-        setPlaying(null);
-      } else if (playing !== name && playing !== null) {
-        audioEl1.current.pause();
-        audioEl1.current.currentTime = 0;
-        currRef.current.play();
-        setPlaying(name);
-        setName(name);
-        setCurrSubtitle(stories[name][captionIndex].text);
-      } else {
-        currRef.current.play();
-        setName(name);
-        setPlaying(name);
-        setCurrSubtitle(stories[name][captionIndex].text);
-      }
+      setName(name);
+      setCurrSubtitle(stories[name][0].text);
+      setPlaying(name);
+      audioEl.current.play();
     }
   }
 
@@ -262,47 +250,48 @@ function DesktopStory(props) {
     clearInterval(currentTimeInterval);
   }
 
+  const getCaption = (playing, time) => {
+    const whichStory = stories[playing];
+    const allFittingCaptions = whichStory.filter((cap, i) => {
+      return cap.time > time;
+    });
+    const cap = allFittingCaptions[0];
+    const i = whichStory.indexOf(cap);
+    const capData = {
+      time: cap ? cap.time : 0,
+      caption: cap ? cap.text : null,
+      index: cap ? i : 0,
+    };
+
+    return capData
+  }
+
+  const finishListening = name => {
+    setDonePlaying(name);
+    setPlaying(null);
+    setCaptionIndex(0);
+  }
+
   const updateTime = () => {
     if (!playing) {
       return;
     }
-    const firstRowNames = ['Lorene', 'Baba', 'Shannon'];
-    if (firstRowNames.includes(playing)) {
-      const { currentTime, duration } = audioEl1.current;
-      const timeToChange = stories[playing][captionIndex].time;
 
-      if (currentTime === duration) {
-        setDonePlaying(true);
+    const audioEl = firstRow.includes(name) ? audioEl1 : audioEl2;
+    const otherAudioEl = firstRow.includes(name) ? audioEl2 : audioEl1;
+    const { currentTime, duration } = audioEl.current;
+    const cap = getCaption(playing, currentTime);
+    const i = cap.index;
+
+    if (currentTime === duration) {
+      finishListening(name)
+    }
+
+    if (currentTime > cap.time - .25) {
+      if (stories[playing][i + 1]) {
+        setCurrSubtitle(stories[playing][i + 1].text);
+        setCaptionIndex(i + 1);
       }
-
-      if (currentTime > timeToChange) {
-        if (stories[name][captionIndex + 1]) {
-          setCurrSubtitle(stories[playing][captionIndex + 1].text);
-          setCaptionIndex(captionIndex + 1);
-        }
-      }
-
-      const currentAudioTime = Math.floor(currentTime);
-      setCurrTime(currentAudioTime);
-      console.log(name, currSubtitle, currentAudioTime);
-    } else {
-      const { currentTime, duration } = audioEl2.current;
-      const timeToChange = stories[playing][captionIndex].time;
-
-      if (currentTime === duration) {
-        setDonePlaying(true);
-      }
-
-      if (currentTime > timeToChange) {
-        if (stories[name][captionIndex + 1]) {
-          setCurrSubtitle(stories[playing][captionIndex + 1].text);
-          setCaptionIndex(captionIndex + 1);
-        }
-      }
-
-      const currentAudioTime = Math.floor(currentTime);
-      setCurrTime(currentAudioTime);
-      console.log(name, currSubtitle, currentAudioTime);
     }
   }
 
@@ -315,7 +304,7 @@ function DesktopStory(props) {
         const { image, name, state, audio } = entry.fields;
         const { url } = image.fields.file;
         const currRef = i === 0 ? audioEl1 : audioEl2;
-        const currState = playing === null ? '/img/play.svg' : playing === name ? '/img/pause.svg' : '/img/play.svg';
+        const currState = donePlaying === name ? '/img/replay.svg' : playing === null ? '/img/play.svg' : playing === name ? '/img/pause.svg' : '/img/play.svg';
         return (
           <div className='DesktopStory-body'>
             <div className='left'>
@@ -325,10 +314,22 @@ function DesktopStory(props) {
               { playing === name && (
                 <h3> {currSubtitle} </h3>
               )}
-              { playing !== name && (
+              { playing !== name && donePlaying !== name && (
                 <h3> {name + ' of ' + state} </h3>
               )}
-              <img onClick={() => updatePlayStatus(name, currRef)} className='playPause' src={currState} />
+              { donePlaying === name && (
+                <div className="replay-container">
+                  <p> Listen to the entire series on </p>
+                  <div className='replay-links'>
+                    <a href='https://espn.com/nba'> Spotify, </a>
+                    <a href='https://espn.com/nba'> iTunes, </a>
+                    <p> or </p>
+                    <a className='last-link' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+                    <p className='period'> . </p>
+                  </div>
+                </div>
+              )}
+              <img onClick={() => updatePlayStatus(name)} className='playPause' src={currState} />
               <audio src={audio.fields.file.url} ref={currRef} onTimeUpdate={updateTime} />
             </div>
           </div>
@@ -370,7 +371,7 @@ function DesktopStory(props) {
         }
 
         .DesktopStory .x {
-          position: absolute;
+          position: fixed;
           top: 25px;
           right: 25px;
           height: 40px;
@@ -412,7 +413,20 @@ function DesktopStory(props) {
           transform: translateX(-50%);
         }
 
-        .links * {
+        .last-link {
+          margin-right: 0px;
+        }
+
+        .replay-container p {
+          font-size: 20px;
+          text-align: center;
+        }
+
+        .replay-container .period {
+          margin: 0px;
+        }
+
+        .replay-links, .links * {
           white-space: nowrap;
         }
 
