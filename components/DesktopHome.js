@@ -20,7 +20,7 @@ DesktopHome.getInitialProps = async function(context) {
 
 function DesktopHome(props) {
   const [story, setStory] = useState(null);
-  const [entry, setEntry] = useState(null);
+  const [showState, setShowState] = useState(null);
   const { entries, state } = props;
 
   return (
@@ -29,39 +29,53 @@ function DesktopHome(props) {
         { story === null && (
           <div className='body'>
             <div className='map'>
-                <img src='/img/main-img.png' alt='map'/>
-                { entries.map((entry, i) => {
-                  const { state } = entry.fields;
-                  const { stateImg, color, top, left } = getDotAssets(state);
-                  const colorStyles = {
-                    background: color
-                  }
-                  const positionStyles = {
-                    top: top +'%',
-                    left: left +'%',
-                  }
-                  return (
-                    <div style={positionStyles} onClick={() => setStory(state)} className='dot-container'>
-                      <div style={colorStyles} className='dot' key={i}></div>
-                      <img src={stateImg} className='state-img' alt={state} />
-                    </div>
-                  )
-                })}
+              <img src='/img/main-img.png' alt='map'/>
+              { entries.map((entry, i) => {
+                const { state } = entry.fields;
+                const { stateImg, color, top, left } = getDotAssets(state);
+                const colorStyles = {
+                  background: color
+                }
+                const positionStyles = {
+                  top: top +'%',
+                  left: left +'%',
+                }
+                return (
+                  <div style={positionStyles} onClick={() => setShowState(state)} className='dot-container'>
+                    <div style={colorStyles} className='dot' key={i}></div>
+                  </div>
+                )
+              })}
+            </div>
+            <div className='about' onClick={() => setStory('About')}>
+              <img src='/img/about-01.png' alt='about' />
+            </div>
+            <div className='legend'>
+              <div className='legend-entry'>
+                <div className='mi-dot'></div>
+                <img className='state-img' src='img/michigan-01.png' />
               </div>
-              <h3 className='about' onClick={() => setStory('About')}> About </h3>
+              <div className='legend-entry'>
+                <div className='wv-dot'></div>
+                <img className='state-img' src='img/west-virginia-01.png' />
+              </div>
+              <div className='legend-entry'>
+                <div className='nm-dot'></div>
+                <img className='state-img' src='img/new-mexico-01.png' />
+              </div>
+            </div>
           </div>
         )}
         { story === 'About' && (
           <About />
         )}
-        { story !== null && story !== 'About' && (
-          <Story entries={entries} state={story} />
+        { showState !== null && story !== 'About' && (
+          <Story entries={entries} state={showState} />
         )}
 
         <style jsx>{`
           .Home {
-            height: 100%;
-            max-height: 100vh;
+            height: 100vh;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -100,12 +114,20 @@ function DesktopHome(props) {
             align-items: center;
           }
 
-          .dot-container .dot {
+          .dot, .mi-dot, .nm-dot, .wv-dot {
             border-radius: 100%;
             background: #00fcfc;
-            height: 40px;
-            width: 40px;
+            height: 30px;
+            width: 30px;
             flex: none;
+          }
+
+          .wv-dot {
+            background: rgba(255, 0, 255, 1);
+          }
+
+          .mi-dot {
+            background: rgba(0, 255, 0, 1);
           }
 
           .dot-container img {
@@ -114,8 +136,13 @@ function DesktopHome(props) {
 
           .about {
             position: absolute;
+            width: 100px;
             top: 30px;
-            right: 40px;
+            right: 30px;
+          }
+
+          .about img {
+            width: 100%;
           }
 
           .details {
@@ -143,6 +170,30 @@ function DesktopHome(props) {
             width: 100%;
           }
 
+          .legend {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            position: absolute;
+            right: 2vw;
+            bottom: 25px;
+          }
+
+          .legend .dot, .mi-dot, .nm-dot, .wv-dot {
+            margin-right: 7px;
+          }
+
+          .legend-entry {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+          }
+
+          .legend .state-img {
+            height: 40px;
+          }
         `}</style>
       </div>
     </Layer>
