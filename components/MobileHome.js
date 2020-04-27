@@ -6,30 +6,28 @@ import Layer from './Layer';
 function MobileHome(props) {
   const [story, setStory] = useState(null);
   const { entries } = props;
+
   return (
     <Layer>
       { story === null && (
         <div className='MobileHome'>
           <img className='main' src='/img/main-img.png' alt='out-here' />
-          { entries.map((entry, i) => {
-            const { state } = entry.fields;
-            const { stateImg, color, mobileTop, mobileLeft } = getDotAssets(state);
-            const colorStyles = {
-              background: color
-            }
-            const positionStyles = {
-              top: mobileTop +'%',
-              left: mobileLeft +'%',
-            }
-            return (
-              <div style={positionStyles} onClick={() => setStory(state)} className='dot-container' key={i}>
-                <div style={colorStyles} className='dot' key={i}></div>
-                <img src={stateImg} className='state-img' alt={state} />
-              </div>
-            )
-          })}
-          <h3 className='about' onClick={() => setStory('About')}> About </h3>
-
+          <img className='byline' src='/img/byline.png' alt='by Kyana Gordon' />
+          <div className='nav-container'>
+            <div onClick={() => setStory('Omar, West Virginia')} className='state-link'>
+              <div className='nm-dot'></div>
+              <img src='/img/west-virginia-01.png' alt='West Virginia' />
+            </div>
+            <div onClick={() => setStory('Detroit, Michigan')} className='state-link'>
+              <div className='mi-dot'></div>
+              <img src='/img/michigan-01.png' alt='Michigan' />
+            </div>
+            <div onClick={() => setStory('Taos, New Mexico')} className='state-link'>
+              <div className='wv-dot'></div>
+              <img src='/img/new-mexico-01.png' alt='New Mexico' />
+            </div>
+          </div>
+          <img className='about' src='/img/about-01.png' onClick={() => setStory('About')}/>
           <style jsx>{`
             .MobileHome {
               width: 100%;
@@ -43,10 +41,48 @@ function MobileHome(props) {
               position: relative;
             }
 
-            .main {
+            .MobileHome .nav-container {
               width: 100%;
-              position: relative;
-              top: -50px;
+              padding: 25px;
+              align-items: flex-start;
+              justify-content: center;
+              flex-direction: column;
+              margin: 10px 0px;
+            }
+
+            .state-link {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+            }
+
+            .nav-container img {
+              height: 75px;
+            }
+
+            .nm-dot, .wv-dot, .mi-dot {
+              height: 30px;
+              width: 30px;
+              border-radius: 100%;
+              background: red;
+              margin-right: 12px;
+            }
+
+            .mi-dot {
+              background: #00ff00;
+            }
+
+            .wv-dot {
+              background: #00fcfc;
+            }
+
+            .nm-dot {
+              background: #ff00ff;
+            }
+
+            .main {
+              width: 90%;
             }
 
             .logo {
@@ -63,23 +99,8 @@ function MobileHome(props) {
               position: relative;
             }
 
-            .dot-container {
-              display: flex;
-              flex-direction: column;
-              position: absolute;
-              left: 50px;
-              top: 75px;
-              color: black;
-              flex: none;
-              align-items: center;
-            }
-
-            .dot-container .dot {
-              border-radius: 100%;
-              background: #ffb9a3;
-              height: 40px;
-              width: 40px;
-              flex: none;
+            .about {
+              width: 90px;
             }
 
             h3 {

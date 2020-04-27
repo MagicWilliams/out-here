@@ -67,50 +67,133 @@ function Story(props) {
 }
 
 function MobileStory(props) {
-  const { entry, state } = props;
-  const { audio } = entry.fields;
-  const storyImage = entry.fields.image.fields.file.url;
-  const [playing, setPlaying] = useState(false);
-  const currState = !playing ? '/img/play.svg' : '/img/pause.svg';
-  const audioEl = useRef(null);
-  const randomDotStyles = {
-    background: getDotAssets(state).color,
-  }
+  const [playing, setPlaying] = useState(null);
+  const { entries } = props;
+  const [currAudio, setCurrAudio] = useState(null);
+  const firstRow = ['Lorene', 'Baba', 'Shannon'];
+  const initName = playing ? playing : entries[0].fields.name;
+  const [name, setName] = useState(initName);
+  const [donePlaying, setDonePlaying] = useState(null);
+  const [captionIndex, setCaptionIndex] = useState(0);
+  const [currSubtitle, setCurrSubtitle] = useState(stories[name][captionIndex].text);
+  const audioEl1 = useRef(null);
+  const audioEl2 = useRef(null);
+  const audioEl = playing === entries[0].fields.name ? audioEl1 : audioEl2;
+  const updatePlayStatus = (name) => {
+    const audioEl = firstRow.includes(name) ? audioEl1 : audioEl2;
+    const otherAudioEl = firstRow.includes(name) ? audioEl2 : audioEl1;
+    if (donePlaying === name) {
+      setDonePlaying(null);
+    }
 
-  const updatePlayStatus = () => {
-    if (playing) {
+    if (playing === name) {
       audioEl.current.pause();
+      setPlaying(null);
+    } else if (playing !== null && playing !== name) {
+      otherAudioEl.current.pause();
+      setCaptionIndex(0);
+      audioEl.current.currentTime = 0;
+      otherAudioEl.current.currentTime = 0;
+      audioEl.current.play();
+      setName(name);
+      setCurrSubtitle(stories[name][0].text);
+      setPlaying(name);
     } else {
+      setName(name);
+      setCurrSubtitle(stories[name][0].text);
+      setPlaying(name);
       audioEl.current.play();
     }
-    setPlaying(!playing);
   }
+
+  const getCaption = (playing, time) => {
+    const whichStory = stories[playing];
+    const allFittingCaptions = whichStory.filter((cap, i) => {
+      return cap.time > time;
+    });
+    const cap = allFittingCaptions[0];
+    const i = whichStory.indexOf(cap);
+    const capData = {
+      time: cap ? cap.time : 0,
+      caption: cap ? cap.text : null,
+      index: cap ? i : 0,
+    };
+
+    return capData
+  }
+
+  const finishListening = name => {
+    setDonePlaying(name);
+    setPlaying(null);
+    setCaptionIndex(0);
+  }
+
+  const updateTime = () => {
+    if (!playing) {
+      return;
+    }
+
+    const audioEl = firstRow.includes(name) ? audioEl1 : audioEl2;
+    const otherAudioEl = firstRow.includes(name) ? audioEl2 : audioEl1;
+    const { currentTime, duration } = audioEl.current;
+    const cap = getCaption(playing, currentTime);
+    const i = cap.index;
+
+    if (currentTime === duration) {
+      finishListening(name)
+    }
+
+    if (currentTime > cap.time - .25) {
+      if (stories[playing][i + 1]) {
+        setCurrSubtitle(stories[playing][i + 1].text);
+        setCaptionIndex(i + 1);
+      }
+    }
+  }
+
 
   return (
     <div className='MobileStory'>
       <img className='state' src='/img/state.png' />
       <img onClick={() => window.location.href = '/'} className='x' src='/img/x.svg' alt='exit'/>
       <h1 className='state'></h1>
-      <div className='img-container' onClick={updatePlayStatus}>
-        <div style={randomDotStyles} className='randomDot'> </div>
-        <img className='main-img' src={storyImage} alt='Story photo' />
-        <h3 className='title'> Kim Gordon of West Virginia </h3>
-      </div>
+      { entries.map((entry, i) => {
+        const { image, name, state, audio } = entry.fields;
+        const { url } = image.fields.file;
+        const audioElement = i % 2 === 0 ? audioEl1 : audioEl2;
+        const currState = donePlaying === name ? '/img/replay.svg' : playing === null ? '/img/play.svg' : playing === name ? '/img/pause.svg' : '/img/play.svg';
+        return (
+          <div className='entry'>
+            <div className='img-container' onClick={() => updatePlayStatus(name)}>
+              <img className='main-img' src={url} alt='Story photo' />
+            </div>
 
-      <div className='audio'>
-        <audio id='audiofile' ref={audioEl} src={audio.fields.file.url} />
-      </div>
+            <div className='audio'>
+              <audio id='audiofile' ref={audioElement} src={audio.fields.file.url} onTimeUpdate={updateTime}/>
+              { playing === name && (
+                <h3> {currSubtitle} </h3>
+              )}
+              { playing !== name && donePlaying !== name && (
+                <h3> {name + ' of ' + state} </h3>
+              )}
+              { donePlaying === name && (
+                <div className="replay-container">
+                  <p> Listen to the entire series on </p>
+                  <div className='replay-links'>
+                    <a href='https://espn.com/nba'> Spotify, </a>
+                    <a href='https://espn.com/nba'> iTunes, </a>
+                    <p> or </p>
+                    <a className='last-link' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+                    <p className='period'> . </p>
+                  </div>
+                </div>
+              )}
+              <img src={currState} className='playPause' onClick={() => updatePlayStatus(name)} />
+            </div>
+          </div>
+        )
+      })}
 
-      <img src={currState} className='playPause' onClick={updatePlayStatus} />
-
-      <p className='pre-links'> Listen to the entire series on </p>
-      <div className='links'>
-        <a href='https://espn.com/nba'> Spotify, </a>
-        <a href='https://espn.com/nba'> iTunes, </a>
-        <p> or </p>
-        <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
-        <p className='period'> . </p>
-      </div>
 
       <style jsx> {`
         .MobileStory {
@@ -132,13 +215,11 @@ function MobileStory(props) {
           margin-top: 10px
         }
 
-        .MobileStory .randomDot {
-          border-radius: 100%;
-          height: 50px;
-          width: 50px;
-          position: absolute;
-          top: -13px;
-          left: 275px;
+        .MobileStory .audio h3 {
+          width: 75%;
+          text-align: center;
+          margin: 10px 0px;
+          margin-top: 25px;
         }
 
         .MobileStory .x {
@@ -148,6 +229,17 @@ function MobileStory(props) {
           height: 40px;
           width: 40px;
           z-index: 2;
+        }
+
+        .MobileStory .entry {
+          margin: 10px 0px;
+        }
+
+        .MobileStory .audio {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
 
         .MobileStory .state {
@@ -175,23 +267,24 @@ function MobileStory(props) {
           margin-top: 15px;
         }
 
-        .links {
+        .MobileStory .replay-links {
           display: flex;
           justify-content: center;
-          width: 70%;
+          width: 100%;
         }
 
-        .links * {
+        .MobileStory .replay-links * {
           margin: 0px 2px;
           font-size: 14px;
           white-space: nowrap;
+          width: 100%;
         }
 
-        .replay-links .fin, links .fin {
+        .replay-links .last-link, links .last-link {
           margin-right: 0px;
         }
 
-        .links .period {
+        .MobileStory .links .period {
           margin: 0;
         }
 
@@ -229,7 +322,7 @@ function DesktopStory(props) {
     if (playing === name) {
       audioEl.current.pause();
       setPlaying(null);
-    } else if (playing !== null && playing !== null) {
+    } else if (playing !== null && playing !== name) {
       otherAudioEl.current.pause();
       setCaptionIndex(0);
       audioEl.current.currentTime = 0;
