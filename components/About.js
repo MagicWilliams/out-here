@@ -50,7 +50,7 @@ function MobileAbout() {
         }
 
         .MobileAbout .x {
-          position: absolute;
+          position: fixed;
           top: 25px;
           right: 25px;
           height: 40px;
@@ -103,7 +103,7 @@ function DesktopAbout() {
         }
 
         .About .x {
-          position: absolute;
+          position: fixed;
           top: 25px;
           right: 25px;
           height: 40px;

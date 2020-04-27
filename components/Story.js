@@ -223,7 +223,7 @@ function MobileStory(props) {
         }
 
         .MobileStory .x {
-          position: absolute;
+          position: fixed;
           top: 25px;
           right: 25px;
           height: 40px;
