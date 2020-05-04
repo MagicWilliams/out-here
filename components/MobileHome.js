@@ -32,6 +32,7 @@ function MobileHome(props) {
             .MobileHome {
               width: 100%;
               min-height: 90vh;
+              min-width: 300px;
               display: flex;
               flex-direction: column;
               justify-content: center;
@@ -58,7 +59,9 @@ function MobileHome(props) {
             }
 
             .nav-container img {
-              height: 75px;
+              min-height: 45px;
+              max-height: 75px;
+              height: 15vw;
             }
 
             .nm-dot, .wv-dot, .mi-dot {

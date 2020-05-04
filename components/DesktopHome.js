@@ -47,19 +47,17 @@ function DesktopHome(props) {
                 )
               })}
             </div>
-            <div className='about' onClick={() => setStory('About')}>
-              <img src='/img/about-01.png' alt='about' />
-            </div>
+            <img className='about' onClick={() => setStory('About')} src='/img/about-01.png' alt='about' />
             <div className='legend'>
-              <div className='legend-entry'>
+              <div className='legend-entry' onClick={() => setShowState('Detroit, Michigan')}>
                 <div className='mi-dot'></div>
                 <img className='state-img' src='img/michigan-01.png' />
               </div>
-              <div className='legend-entry'>
+              <div className='legend-entry' onClick={() => setShowState('Omar, West Virginia')}>
                 <div className='wv-dot'></div>
                 <img className='state-img' src='img/west-virginia-01.png' />
               </div>
-              <div className='legend-entry'>
+              <div className='legend-entry' onClick={() => setShowState('Taos, New Mexico')}>
                 <div className='nm-dot'></div>
                 <img className='state-img' src='img/new-mexico-01.png' />
               </div>
@@ -136,7 +134,7 @@ function DesktopHome(props) {
 
           .about {
             position: absolute;
-            width: 100px;
+            width: 80px;
             top: 30px;
             right: 30px;
           }

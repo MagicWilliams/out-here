@@ -45,6 +45,10 @@ function MobileAbout() {
           padding: 25px;
         }
 
+        .MobileAbout .body {
+          width: 40%;
+        }
+
         .MobileAbout p {
           text-align: center;
         }

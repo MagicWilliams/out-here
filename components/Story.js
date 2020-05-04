@@ -194,6 +194,18 @@ function MobileStory(props) {
         )
       })}
 
+      { !donePlaying && (
+        <div className='mobile-links'>
+          <p> Listen to the entire series on </p>
+          <div>
+            <a href='https://espn.com/nba'> Spotify, </a>
+            <a href='https://espn.com/nba'> iTunes, </a>
+            <p> or </p>
+            <a className='fin' href='https://espn.com/nba' target='_blank'> Soundcloud </a>
+            <p className='period'> . </p>
+          </div>
+        </div>
+      )}
 
       <style jsx> {`
         .MobileStory {
@@ -267,24 +279,39 @@ function MobileStory(props) {
           margin-top: 15px;
         }
 
-        .MobileStory .replay-links {
+        .MobileStory .replay-links, .mobile-links {
           display: flex;
           justify-content: center;
           width: 100%;
         }
 
-        .MobileStory .replay-links * {
+        .MobileStory .replay-links *, .mobile-links * {
           margin: 0px 2px;
           font-size: 14px;
           white-space: nowrap;
           width: 100%;
         }
 
-        .replay-links .last-link, links .last-link {
+        .mobile-links * {
+          margin-left: 0px;
+        }
+
+        .last-link {
           margin-right: 0px;
         }
 
-        .MobileStory .links .period {
+        .mobile-links {
+          flex-direction: column;
+          width: 50%;
+          text-align: center;
+          margin: 25px 0px;
+        }
+
+        .mobile-links div {
+          display: flex;
+        }
+
+        .mobile-links .period {
           margin: 0;
         }
 

@@ -3,12 +3,34 @@ import Head from 'next/head';
 import { withUserAgent } from 'next-useragent';
 import DesktopHome from '../components/DesktopHome';
 import MobileHome from '../components/MobileHome';
-import { useCurrentWidth } from '../utils';
 
 function Home(props) {
   const { isMobile } = props.ua;
+  const [width, setWidth] = useState(null);
+  const getWidth = () => window.innerWidth
+    || document.documentElement.clientWidth
+    || document.body.clientWidth;
 
-  return !isMobile ? (
+  useEffect(() => {
+    const resizeListener = () => {
+      // change width from the state object
+      console.log(getWidth());
+      setWidth(getWidth())
+    };
+    resizeListener();
+    // set resize listener
+    window.addEventListener('resize', resizeListener);
+
+    // clean up function
+    return () => {
+      // remove resize listener
+      window.removeEventListener('resize', resizeListener);
+    }
+  }, [])
+
+  const renderMobile = isMobile || (width !== null && width < 450);
+
+  return !renderMobile ? (
     <div>
       <Head>
         <title>Out Here - Kyana Gordon</title>
